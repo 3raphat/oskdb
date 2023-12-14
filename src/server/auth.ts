@@ -1,13 +1,14 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import bcrypt from "bcryptjs"
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
-} from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+} from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
 
-import { env } from "@/env";
-import { db } from "@/server/db";
+import { logInSchema } from "@/lib/validation/auth"
+import { db } from "@/server/db"
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -18,16 +19,22 @@ import { db } from "@/server/db";
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
-      id: string;
+      id: string
       // ...other properties
       // role: UserRole;
-    } & DefaultSession["user"];
+      username: string
+    } & DefaultSession["user"]
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    username: string
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    username: string
+  }
 }
 
 /**
@@ -37,19 +44,59 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
+        id: token.sub,
+        username: token.username,
       },
     }),
+    jwt: ({ token, user }) => {
+      if (user) {
+        token.username = user.username
+      }
+      return token
+    },
   },
   adapter: PrismaAdapter(db),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        username: {
+          label: "Username",
+          type: "text",
+          placeholder: "username",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+        },
+      },
+      async authorize(credentials) {
+        const parsedCredentials = logInSchema.safeParse(credentials)
+
+        if (parsedCredentials.success) {
+          const { username, password } = parsedCredentials.data
+
+          const user = await db.user.findFirst({
+            where: {
+              username,
+            },
+          })
+
+          if (!user) throw new Error("ไม่พบชื่อผู้ใช้")
+
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          const isPasswordValid = await bcrypt.compare(password, user.password)
+
+          if (!isPasswordValid) throw new Error("รหัสผ่านไม่ถูกต้อง")
+
+          return user
+        }
+        return null
+      },
     }),
     /**
      * ...add more providers here.
@@ -61,11 +108,17 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-};
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/login",
+  },
+}
 
 /**
  * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
  *
  * @see https://next-auth.js.org/configuration/nextjs
  */
-export const getServerAuthSession = () => getServerSession(authOptions);
+export const getServerAuthSession = () => getServerSession(authOptions)

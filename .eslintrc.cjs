@@ -1,5 +1,6 @@
 /** @type {import("eslint").Linter.Config} */
 const config = {
+  root: true,
   parser: "@typescript-eslint/parser",
   parserOptions: {
     project: true,
@@ -9,6 +10,8 @@ const config = {
     "plugin:@next/next/recommended",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
+    "plugin:tailwindcss/recommended",
+    "plugin:prettier/recommended",
   ],
   rules: {
     // These opinionated rules are enabled in stylistic-type-checked above.
@@ -32,6 +35,18 @@ const config = {
       },
     ],
   },
-};
+  settings: {
+    tailwindcss: {
+      callees: ["cn", "cva"],
+      config: "tailwind.config.ts",
+    },
+  },
+  overrides: [
+    {
+      files: ["*.ts", "*.tsx"],
+      parser: "@typescript-eslint/parser",
+    },
+  ],
+}
 
-module.exports = config;
+module.exports = config
