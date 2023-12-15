@@ -1,15 +1,10 @@
-import { z } from "zod"
+import { logSchema } from "prisma/zod"
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc"
 
 export const logRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(
-      z.object({
-        event: z.enum(["login", "logout", "create"]),
-        message: z.string(),
-      })
-    )
+    .input(logSchema.pick({ event: true, message: true }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.log.create({
         data: {

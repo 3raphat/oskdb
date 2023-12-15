@@ -3,16 +3,10 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
+import { type logSchema } from "prisma/zod"
+import type * as z from "zod"
 
-type Log = {
-  id: string
-  createdAt: Date
-  event: string
-  message: string
-  user: {
-    username: string
-  }
-}
+type Log = z.infer<typeof logSchema>
 
 export const columns: ColumnDef<Log>[] = [
   {

@@ -88,7 +88,6 @@ export const authOptions: NextAuthOptions = {
 
           if (!user) throw new Error("ไม่พบชื่อผู้ใช้")
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
           const isPasswordValid = await bcrypt.compare(password, user.password)
 
           if (!isPasswordValid) throw new Error("รหัสผ่านไม่ถูกต้อง")
@@ -118,7 +117,7 @@ export const authOptions: NextAuthOptions = {
     signIn: async ({ user }) => {
       await db.log.create({
         data: {
-          event: "login",
+          event: "LOGIN",
           message: `${user.username} เข้าสู่ระบบ`,
           user: { connect: { id: user.id } },
         },
@@ -127,7 +126,7 @@ export const authOptions: NextAuthOptions = {
     signOut: async ({ token }) => {
       await db.log.create({
         data: {
-          event: "logout",
+          event: "LOGOUT",
           message: `${token.username} ออกจากระบบ`,
           user: { connect: { id: token.sub } },
         },

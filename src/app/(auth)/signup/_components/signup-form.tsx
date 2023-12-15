@@ -51,7 +51,7 @@ export function SignUpForm() {
       password: values.password,
     })
     createLog.mutate({
-      event: "create",
+      event: "CREATE",
       message: `สร้างบัญชีผู้ใช้ ${values.username}`,
     })
   }
