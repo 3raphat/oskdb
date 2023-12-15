@@ -43,10 +43,16 @@ export function SignUpForm() {
     },
   })
 
+  const createLog = api.log.create.useMutation()
+
   function onSubmit(values: Omit<FormValues, "confirmPassword">) {
     createUser.mutate({
       username: values.username,
       password: values.password,
+    })
+    createLog.mutate({
+      event: "create",
+      message: `สร้างบัญชีผู้ใช้ ${values.username}`,
     })
   }
 

@@ -114,6 +114,26 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
+  events: {
+    signIn: async ({ user }) => {
+      await db.log.create({
+        data: {
+          event: "login",
+          message: `${user.username} เข้าสู่ระบบ`,
+          user: { connect: { id: user.id } },
+        },
+      })
+    },
+    signOut: async ({ token }) => {
+      await db.log.create({
+        data: {
+          event: "logout",
+          message: `${token.username} ออกจากระบบ`,
+          user: { connect: { id: token.sub } },
+        },
+      })
+    },
+  },
 }
 
 /**
