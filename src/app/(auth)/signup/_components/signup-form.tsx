@@ -101,7 +101,7 @@ export function SignUpForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={createUser.isLoading}
+          isLoading={createUser.isLoading}
         >
           สร้างบัญชีผู้ใช้
         </Button>

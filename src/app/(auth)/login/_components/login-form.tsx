@@ -94,7 +94,7 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full" isLoading={isLoading}>
           เข้าสู่ระบบ
         </Button>
       </form>
