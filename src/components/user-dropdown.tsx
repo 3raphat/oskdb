@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { History, LogOut, UserPlus } from "lucide-react"
+import { History, LogOut, UserPlus2 } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -32,7 +32,7 @@ export async function UserDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/signup">
-            <UserPlus className="mr-2 h-4 w-4" />
+            <UserPlus2 className="mr-2 h-4 w-4" />
             <span>สร้างบัญชีผู้ดูแลระบบ</span>
           </Link>
         </DropdownMenuItem>
