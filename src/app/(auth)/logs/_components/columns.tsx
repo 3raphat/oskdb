@@ -3,8 +3,9 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
-import { type logSchema } from "prisma/zod"
-import type * as z from "zod"
+import { type z } from "zod"
+
+import { type logSchema } from "@/lib/validation/log"
 
 type Log = z.infer<typeof logSchema>
 

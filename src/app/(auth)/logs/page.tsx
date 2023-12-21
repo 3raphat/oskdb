@@ -1,5 +1,5 @@
 import { columns } from "@/app/(auth)/logs/_components/columns"
-import { DataTable } from "@/app/(auth)/logs/_components/data-table"
+import { DataTable } from "@/components/data-table/data-table"
 import { PageHeader } from "@/components/page-header"
 import { api } from "@/trpc/server"
 

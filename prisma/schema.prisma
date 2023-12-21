@@ -78,12 +78,81 @@ enum LogEvent {
   CREATE
 }
 
-generator zod {
-  provider              = "zod-prisma"
-  output                = "./zod"
-  relationModel         = true
-  modelCase             = "camelCase"
-  modelSuffix           = "Schema"
-  useDecimalJs          = true
-  prismaJsonNullability = true
+model MemberList {
+  memberid       Int     @id
+  osk_id         String?
+  namet          String
+  surnamet       String?
+  oskgeneration  String?
+  address        String?
+  prefix_name    String?
+  changwat_tname String?
+  picture        String?
+  tel            String?
+  mobile         String?
+  fax            String?
+  status_id      Int?
+}
+
+model MemberRegistration {
+  id                 Int               @id @default(autoincrement())
+  createdAt          DateTime          @default(now())
+  registration_type  RegistrationType
+  registration_state RegistrationState @default(PENDING)
+
+  prefix_name   String?
+  name_th       String
+  surname_th    String
+  name_en       String?
+  surname_en    String?
+  old_name      String?
+  old_surname   String?
+  citizen_id    String
+  birthdate     DateTime?
+  sk_since_year String?
+  sk_until_year String?
+  generation    String
+  osk_id        String
+  status        MemberStatus
+
+  address_number String?
+  alley          String?
+  road           String?
+  sub_district   String?
+  district       String?
+  province       String?
+  postalcode     String?
+  mobile         String?
+  tel            String?
+  email          String?
+  line_id        String?
+
+  workplace           String?
+  work_address_number String?
+  building            String?
+  work_alley          String?
+  work_road           String?
+  work_sub_district   String?
+  work_district       String?
+  work_province       String?
+  work_postalcode     String?
+  work_tel            String?
+  work_fax            String?
+}
+
+enum RegistrationType {
+  LIFETIME
+  HONORARY
+}
+
+enum RegistrationState {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MemberStatus {
+  ALIVE
+  DECEASED
+  LOST
 }

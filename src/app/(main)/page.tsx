@@ -1,13 +1,15 @@
-import { getServerAuthSession } from "@/server/auth"
+import { PageHeader } from "@/components/page-header"
 
-export default async function Home() {
-  const session = await getServerAuthSession()
-
+export default function Home() {
   return (
-    <main className="">
-      <pre>
-        <code>{JSON.stringify(session, null, 2)}</code>
-      </pre>
-    </main>
+    <div className="container mx-auto py-10">
+      <PageHeader
+        heading="คู่มือการใช้งานระบบ"
+        text="คู่มือการใช้งานระบบ สำหรับผู้ดูแลระบบ"
+      />
+      <div className="grid h-[500px] w-full place-items-center rounded-lg border">
+        พื้นที่สำหรับใส่คู่มือ
+      </div>
+    </div>
   )
 }

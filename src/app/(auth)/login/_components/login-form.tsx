@@ -49,12 +49,10 @@ export function LoginForm() {
 
       if (result?.error === "ไม่พบชื่อผู้ใช้") {
         form.setError("username", {
-          type: "manual",
           message: result.error,
         })
       } else if (result?.error === "รหัสผ่านไม่ถูกต้อง") {
         form.setError("password", {
-          type: "manual",
           message: result.error,
         })
       }

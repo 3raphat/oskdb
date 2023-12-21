@@ -1,5 +1,4 @@
-import { logSchema } from "prisma/zod"
-
+import { logSchema } from "@/lib/validation/log"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc"
 
 export const logRouter = createTRPCRouter({

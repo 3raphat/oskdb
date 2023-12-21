@@ -20,7 +20,7 @@ export default function LoadingPage() {
         <div className="flex items-center justify-center space-x-2">
           <div className="h-6 w-6 animate-bounce rounded-full bg-cyan-400 [animation-delay:-0.3s]" />
           <div className="h-6 w-6 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.15s]" />
-          <div className="h-6 w-6 animate-bounce rounded-full bg-yellow-400" />
+          <div className="h-6 w-6 animate-bounce rounded-full bg-amber-400" />
         </div>
         <p className="text-lg">
           กรุณารอสักครู่

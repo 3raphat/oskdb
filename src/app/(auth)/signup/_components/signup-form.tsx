@@ -36,10 +36,13 @@ export function SignUpForm() {
       form.reset()
     },
     onError: (error) => {
-      form.setError("username", {
-        type: "manual",
-        message: error.message,
-      })
+      switch (error.message) {
+        case "CONFLICT": {
+          form.setError("username", {
+            message: error.message,
+          })
+        }
+      }
     },
   })
 
