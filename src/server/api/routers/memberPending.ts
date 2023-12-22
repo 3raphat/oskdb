@@ -35,6 +35,37 @@ export const memberPendingRouter = createTRPCRouter({
     })
   }),
 
+  updateImageUrl: protectedProcedure
+    .input(
+      memberRegistrationSchema.pick({
+        id: true,
+        image_url: true,
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const exists = await ctx.db.memberRegistration.findFirst({
+        where: {
+          id: input.id,
+        },
+      })
+
+      if (!exists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "ไม่พบข้อมูลสมาชิกนี้",
+        })
+      }
+
+      return ctx.db.memberRegistration.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          image_url: input.image_url,
+        },
+      })
+    }),
+
   updateState: protectedProcedure
     .input(
       memberRegistrationSchema.pick({

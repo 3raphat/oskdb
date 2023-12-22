@@ -10,6 +10,7 @@ import {
 import { type z } from "zod"
 
 import { ButtonSort } from "@/components/data-table/button-sort"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -99,6 +100,18 @@ export const columns: ColumnDef<Member>[] = [
   {
     accessorKey: "tel",
     header: "เบอร์โทรศัพท์",
+  },
+  {
+    accessorKey: "image_url",
+    header: "รูปภาพ",
+    cell: ({ row }) => {
+      const image_url = row.original.image_url!
+      return (
+        <Avatar>
+          <AvatarImage src={image_url} alt="member" />
+        </Avatar>
+      )
+    },
   },
   {
     id: "actions",

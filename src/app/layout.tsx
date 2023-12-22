@@ -2,6 +2,10 @@ import "@/styles/globals.css"
 
 import { cookies } from "next/headers"
 
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
+import { extractRouterConfig } from "uploadthing/server"
+
+import { ourFileRouter } from "@/app/api/uploadthing/core"
 import { Providers } from "@/components/providers"
 import { cn } from "@/lib/utils"
 import { body, sans } from "@/styles/fonts"
@@ -28,6 +32,7 @@ export default function RootLayout({
         )}
       >
         <TRPCReactProvider cookies={cookies().toString()}>
+          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
           <Providers>{children}</Providers>
         </TRPCReactProvider>
       </body>

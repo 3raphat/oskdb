@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Image from "next/image"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { MemberStatus, RegistrationType } from "@prisma/client"
@@ -42,6 +43,7 @@ import {
 import { cn } from "@/lib/utils"
 import { memberRegistrationSchema } from "@/lib/validation/member"
 import { api } from "@/trpc/react"
+import { useUploadThing } from "@/utils/uploadthing"
 
 import { FormSection } from "./form-section"
 
@@ -68,10 +70,7 @@ export function RegisterForm() {
         case "CONFLICT": {
           form.setError(
             "id",
-            {
-              type: "exist",
-              message: error.message,
-            },
+            { type: "exist", message: error.message },
             { shouldFocus: true }
           )
         }
@@ -79,115 +78,194 @@ export function RegisterForm() {
     },
   })
 
-  function onSubmit(values: FormValues) {
-    values.sub_district = address.subdistrict
-    values.district = address.district
-    values.province = address.province
-    values.postalcode = address.postalCode
+  const updateImage = api.memberPending.updateImageUrl.useMutation()
 
-    values.work_sub_district = workAddress.subdistrict
-    values.work_district = workAddress.district
-    values.work_province = workAddress.province
-    values.work_postalcode = workAddress.postalCode
+  const [isLoading, setIsLoading] = useState(false)
 
-    createMember.mutate(values)
+  const [image, setImage] = useState<File>()
+  const [previewImage, setPreviewImage] = useState("")
+
+  const { startUpload } = useUploadThing("imageUploader")
+
+  useEffect(() => {
+    if (image) {
+      setPreviewImage(URL.createObjectURL(image))
+    }
+  }, [image])
+
+  async function onSubmit(values: FormValues) {
+    try {
+      setIsLoading(true)
+
+      values.sub_district = address.subdistrict
+      values.district = address.district
+      values.province = address.province
+      values.postalcode = address.postalCode
+
+      values.work_sub_district = workAddress.subdistrict
+      values.work_district = workAddress.district
+      values.work_province = workAddress.province
+      values.work_postalcode = workAddress.postalCode
+
+      await createMember.mutateAsync(values).then(async () => {
+        if (image) {
+          toast.promise(
+            startUpload([image]).then(
+              (res) => {
+                if (res?.[0]) {
+                  values.image_url = res[0].url
+                  // update url to db
+                  updateImage.mutate({
+                    id: values.id,
+                    image_url: values.image_url,
+                  })
+                }
+              },
+              (error) => {
+                console.error(error)
+              }
+            ),
+            {
+              loading: "กำลังอัพโหลดรูปภาพ",
+              success: "อัพโหลดรูปภาพสำเร็จ",
+              error: "เกิดข้อผิดพลาดขณะอัปโหลด",
+            }
+          )
+        }
+      })
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormSection title="ข้อมูลส่วนตัว">
-          <FormField
-            control={form.control}
-            name="registration_type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ประเภทการสมัคร</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
+          <div className="flex justify-between">
+            <div>
+              <FormField
+                control={form.control}
+                name="registration_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ประเภทการสมัคร</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value={RegistrationType.LIFETIME} />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            ตลอดชีพ (500 บาท)
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value={RegistrationType.HONORARY} />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            สมาชิกกิตติมศักดิ์
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-start space-x-4">
+                <FormField
+                  control={form.control}
+                  name="id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ทะเบียนสมาชิกเลขที่</FormLabel>
                       <FormControl>
-                        <RadioGroupItem value={RegistrationType.LIFETIME} />
+                        <Input {...field} />
                       </FormControl>
-                      <FormLabel className="font-normal">
-                        ตลอดชีพ (500 บาท)
-                      </FormLabel>
+                      <FormMessage />
                     </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value={RegistrationType.HONORARY} />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        สมาชิกกิตติมศักดิ์
-                      </FormLabel>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="createdAt"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <div>
+                        <FormLabel>วันที่</FormLabel>
+                      </div>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-[280px] justify-start text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP", { locale: th })
+                              ) : (
+                                <span>เลือกวันที่</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            fromYear={1900}
+                            toYear={2200}
+                            captionLayout="dropdown-buttons"
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
                     </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex items-start space-x-4">
-            <FormField
-              control={form.control}
-              name="id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>ทะเบียนสมาชิกเลขที่</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="createdAt"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <div>
-                    <FormLabel>วันที่</FormLabel>
-                  </div>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-[280px] justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: th })
-                          ) : (
-                            <span>เลือกวันที่</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        fromYear={1900}
-                        toYear={2200}
-                        captionLayout="dropdown-buttons"
-                        initialFocus
+                  )}
+                />
+              </div>
+            </div>
+            <div>
+              <FormField
+                control={form.control}
+                name="image_url"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>รูปภาพ</FormLabel>
+                    {image && previewImage && (
+                      <Image
+                        src={previewImage}
+                        alt={image.name}
+                        width={150}
+                        height={150}
                       />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    )}
+                    <FormControl>
+                      <Input
+                        required
+                        type="file"
+                        onChange={(e) => setImage(e.target.files![0])}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
           <div className="flex space-x-4">
             <FormField
@@ -809,7 +887,9 @@ export function RegisterForm() {
         {/* TODO - section สมาชิกผู้รับรอง */}
 
         <div className="flex justify-end">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" isLoading={isLoading}>
+            Submit
+          </Button>
         </div>
       </form>
     </Form>

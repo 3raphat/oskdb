@@ -29,6 +29,7 @@ export const memberRegistrationSchema = z.object({
   registration_type: z.nativeEnum(RegistrationType),
   registration_state: z.nativeEnum(RegistrationState).default("PENDING"),
 
+  image_url: z.string().url().nullish(),
   prefix_name: z.string().nullish(),
   name_th: z.string(),
   surname_th: z.string(),
