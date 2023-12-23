@@ -11,7 +11,7 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "format": "prettier --write \"**/*.{ts,tsx,css,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,css,md,js,cjs,json}\"",
     "start": "next start",
     "prepare": "husky install"
   },
@@ -91,6 +91,6 @@
   "packageManager": "pnpm@8.10.5",
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix",
-    "*.{ts,tsx,css,md}": "prettier --write"
+    "*.{ts,tsx,css,md,js,cjs,json}": "prettier --write"
   }
 }
