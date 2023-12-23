@@ -4,6 +4,7 @@ import { type ColumnDef } from "@tanstack/react-table"
 import { type z } from "zod"
 
 import { ButtonSort } from "@/components/data-table/button-sort"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { type memberSchema } from "@/lib/validation/member"
 
@@ -71,5 +72,17 @@ export const columns: ColumnDef<Member>[] = [
   {
     accessorKey: "changwat_tname",
     header: "จังหวัด",
+  },
+  {
+    accessorKey: "picture",
+    header: "รูปภาพ",
+    cell: ({ row }) => {
+      const picture = row.original.picture!
+      return (
+        <Avatar>
+          <AvatarImage src={picture} alt="member" />
+        </Avatar>
+      )
+    },
   },
 ]

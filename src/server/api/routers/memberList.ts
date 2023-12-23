@@ -37,7 +37,6 @@ export const memberListRouter = createTRPCRouter({
           message: "ไม่พบข้อมูลสมาชิกนี้",
         })
       }
-      console.log(member.registration_state)
 
       if (member.registration_state !== RegistrationState.APPROVED) {
         throw new TRPCError({
@@ -45,7 +44,6 @@ export const memberListRouter = createTRPCRouter({
           message: "สมาชิกนี้ยังไม่ได้รับการอนุมัติ",
         })
       }
-      console.log(member.registration_state)
 
       return ctx.db.memberList.create({
         data: {
@@ -64,6 +62,7 @@ export const memberListRouter = createTRPCRouter({
             member.province,
             member.postalcode,
           ].join(" "),
+          picture: member.image_url,
         },
       })
     }),
