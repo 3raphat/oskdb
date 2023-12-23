@@ -144,8 +144,8 @@ export function RegisterForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormSection title="ข้อมูลส่วนตัว">
-          <div className="flex justify-between">
-            <div>
+          <div className="flex flex-col justify-between gap-3 md:flex-row">
+            <div className="space-y-3">
               <FormField
                 control={form.control}
                 name="registration_type"
