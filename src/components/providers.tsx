@@ -3,7 +3,8 @@
 import { type PropsWithChildren } from "react"
 
 import { ThemeProvider } from "next-themes"
-import { Toaster } from "sonner"
+
+import { Toaster } from "@/components/ui/sonner"
 
 export function Providers({ children }: PropsWithChildren) {
   return (
