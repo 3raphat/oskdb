@@ -1,10 +1,10 @@
 import { type Config } from "tailwindcss"
-import animate from "tailwindcss-animate"
 import { fontFamily } from "tailwindcss/defaultTheme"
 
-export default {
+const config = {
   darkMode: ["class"],
-  content: ["./src/**/*.tsx"],
+  content: ["./src/**/*.{ts,tsx}"],
+  prefix: "",
   theme: {
     container: {
       center: true,
@@ -74,5 +74,7 @@ export default {
       },
     },
   },
-  plugins: [animate],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config
+
+export default config
