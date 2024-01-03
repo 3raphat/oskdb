@@ -41,7 +41,7 @@ export const memberRegistrationSchema = z.object({
     .string()
     .min(13)
     .regex(/^[0-9]*$/, { message: "เลขประจำตัวประชาชนต้องเป็นตัวเลขเท่านั้น" })
-    .refine((val) => validThaiNationalID(val), "เลขประจำตัวประชาชนมั่วซั่ว"),
+    .refine((val) => validThaiNationalID(val), "เลขประจำตัวประชาชนไม่ถูกต้อง"),
   birthdate: z.coerce.date().nullish(),
   sk_since_year: z
     .string()
