@@ -1,5 +1,7 @@
 "use client"
 
+import Link from "next/link"
+
 import { type ColumnDef } from "@tanstack/react-table"
 import { type z } from "zod"
 
@@ -83,6 +85,13 @@ export const columns: ColumnDef<Member>[] = [
           <AvatarImage src={picture} alt="member" />
         </Avatar>
       )
+    },
+  },
+  {
+    id: "edit_btn",
+    header: "แก้ไข",
+    cell: ({ row }) => {
+      return <Link href={`/member/edit/${row.original.memberid}`}>แก้ไข</Link>
     },
   },
 ]

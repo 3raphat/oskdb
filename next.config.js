@@ -11,6 +11,9 @@ const config = {
       {
         hostname: "utfs.io",
       },
+      {
+        hostname: "uploadthing.com",
+      },
     ],
   },
 }

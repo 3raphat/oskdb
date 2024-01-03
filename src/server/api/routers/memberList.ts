@@ -1,7 +1,7 @@
 import { RegistrationState } from "@prisma/client"
 import { TRPCError } from "@trpc/server"
 
-import { memberRegistrationSchema } from "@/lib/validation/member"
+import { memberRegistrationSchema, memberSchema } from "@/lib/validation/member"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc"
 
 export const memberListRouter = createTRPCRouter({
@@ -70,4 +70,51 @@ export const memberListRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.db.memberList.findMany()
   }),
+
+  getById: protectedProcedure
+    .input(memberRegistrationSchema.pick({ id: true }))
+    .query(({ ctx, input }) => {
+      return ctx.db.memberList.findFirst({
+        where: {
+          memberid: input.id,
+        },
+      })
+    }),
+
+  update: protectedProcedure
+    .input(memberSchema)
+    .mutation(async ({ ctx, input }) => {
+      const member = await ctx.db.memberList.findUnique({
+        where: {
+          memberid: input.memberid,
+        },
+      })
+
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "ไม่พบข้อมูลสมาชิกนี้",
+        })
+      }
+
+      return ctx.db.memberList.update({
+        where: {
+          memberid: input.memberid,
+        },
+        data: {
+          osk_id: input.osk_id,
+          namet: input.namet,
+          surnamet: input.surnamet,
+          oskgeneration: input.oskgeneration,
+          address: input.address,
+          prefix_name: input.prefix_name,
+          changwat_tname: input.changwat_tname,
+          picture: input.picture,
+          tel: input.tel,
+          mobile: input.mobile,
+          fax: input.fax,
+          status_id: input.status_id,
+        },
+      })
+    }),
 })
