@@ -7,7 +7,7 @@ const config = {
   },
   plugins: ["@typescript-eslint", "tailwindcss"],
   extends: [
-    "plugin:@next/next/recommended",
+    "plugin:@next/next/core-web-vitals",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:tailwindcss/recommended",
